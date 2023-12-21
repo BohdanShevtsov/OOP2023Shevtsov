@@ -1,18 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using NUnit.Framework;
 
 public class TableReservationApp
 {
     static void Main(string[] args)
     {
-        TableReservationManager manager = new TableReservationManager();
-        manager.AddRestaurant("A", 10);
-        manager.AddRestaurant("B", 5);
+        try
+        {
+            TableReservationManager manager = new TableReservationManager();
+            manager.AddRestaurant("A", 10);
+            manager.AddRestaurant("B", 5);
 
-        Console.WriteLine(manager.BookTable("A", new DateTime(2023, 12, 25), 3)); // True
-        Console.WriteLine(manager.BookTable("A", new DateTime(2023, 12, 25), 3)); // False
+            Console.WriteLine(manager.BookTable("A", new DateTime(2023, 12, 25), 3)); // True
+            Console.WriteLine(manager.BookTable("A", new DateTime(2023, 12, 25), 3)); // False
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred: {ex.Message}");
+        }
     }
 }
 
@@ -40,14 +46,27 @@ public class TableReservationManager
 
     public bool BookTable(string restaurantName, DateTime date, int tableNumber)
     {
-        var restaurant = Restaurants.FirstOrDefault(r => r.Name == restaurantName);
-
-        if (restaurant != null)
+        try
         {
-            return restaurant.BookTable(date, tableNumber);
-        }
+            var restaurant = Restaurants.FirstOrDefault(r => r.Name == restaurantName);
 
-        throw new InvalidOperationException("Restaurant not found");
+            if (restaurant != null)
+            {
+                return restaurant.BookTable(date, tableNumber);
+            }
+
+            throw new InvalidOperationException("Restaurant not found");
+        }
+        catch (ArgumentException ex)
+        {
+            Console.WriteLine($"Error booking table: {ex.Message}");
+            return false;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An unexpected error occurred: {ex.Message}");
+            return false;
+        }
     }
 
     public void SortRestaurantsByAvailability(DateTime date)
